@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Review Intelligence Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f4f5f7;
+      color: #111;
+      padding: 2rem;
+      min-height: 100vh;
+    }
+
+    .dash-header {
+      margin-bottom: 1.5rem;
+    }
+    .dash-header h1 {
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+    .dash-header p {
+      font-size: 13px;
+      color: #888;
+    }
+
+    .card {
+      background: #fff;
+      border: 0.5px solid rgba(0,0,0,0.1);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .card-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #aaa;
+      margin-bottom: 1rem;
+    }
+
+    /* Metric row */
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 1.25rem;
+    }
+    .metric {
+      background: #f7f8fa;
+      border-radius: 8px;
+      padding: 0.875rem 1rem;
+    }
+    .metric-label {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 4px;
+    }
+    .metric-value {
+      font-size: 22px;
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+    .metric-sub {
+      font-size: 12px;
+      color: #e24b4a;
+    }
+    .metric-sub.neutral {
+      color: #aaa;
+    }
+    .metric-sub.danger-text {
+      color: #a32d2d;
+    }
+
+    /* Finding row */
+    .finding-row {
+      border-top: 0.5px solid rgba(0,0,0,0.08);
+      padding-top: 1rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .finding-block strong {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #aaa;
+      margin-bottom: 3px;
+    }
+    .finding-block p {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #222;
+    }
+
+    /* Two column layout */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .two-col .card {
+      margin-bottom: 0;
+    }
+
+    /* Issue rows */
+    .issue-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 0.5px solid rgba(0,0,0,0.07);
+    }
+    .issue-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .badge {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: 99px;
+      white-space: nowrap;
+    }
+    .badge-high   { background: #fcebeb; color: #a32d2d; }
+    .badge-medium { background: #faeeda; color: #854f0b; }
+    .issue-name   { font-size: 14px; font-weight: 500; flex: 1; }
+    .issue-impact { font-size: 12px; color: #888; }
+
+    /* Driver bars */
+    .driver-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 0;
+      border-bottom: 0.5px solid rgba(0,0,0,0.07);
+    }
+    .driver-row:last-child { border-bottom: none; }
+    .driver-name   { font-size: 14px; flex: 1; }
+    .driver-bar-bg {
+      width: 110px;
+      height: 6px;
+      background: #f0f0f0;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .driver-bar {
+      height: 100%;
+      border-radius: 99px;
+      background: #e24b4a;
+    }
+    .driver-pct {
+      font-size: 13px;
+      font-weight: 500;
+      color: #e24b4a;
+      min-width: 40px;
+      text-align: right;
+    }
+
+    /* Risk items */
+    .risk-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 0.5px solid rgba(0,0,0,0.07);
+      font-size: 13px;
+      color: #333;
+      line-height: 1.4;
+    }
+    .risk-item:last-child { border-bottom: none; }
+    .risk-icon {
+      color: #ba7517;
+      font-size: 15px;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+
+    /* Love items */
+    .love-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 0.5px solid rgba(0,0,0,0.07);
+    }
+    .love-item:last-child { border-bottom: none; }
+    .love-name { font-size: 14px; flex: 1; }
+    .love-pct  { font-size: 13px; font-weight: 500; color: #3b6d11; }
+    .love-icon { color: #3b6d11; font-size: 15px; flex-shrink: 0; }
+
+    /* Business impact */
+    .impact-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 0.5px solid rgba(0,0,0,0.07);
+    }
+    .impact-row:last-child { border-bottom: none; }
+    .impact-name { font-size: 14px; font-weight: 500; white-space: nowrap; }
+    .impact-tags { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .impact-tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 99px;
+      background: #f7f8fa;
+      color: #888;
+    }
+    .impact-tag.high   { background: #fcebeb; color: #a32d2d; }
+    .impact-tag.medium { background: #faeeda; color: #854f0b; }
+
+    /* Recommendations */
+    .rec-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 12px;
+      background: #f7f8fa;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    .rec-item:last-child { margin-bottom: 0; }
+    .rec-num {
+      font-size: 12px;
+      font-weight: 500;
+      color: #185fa5;
+      background: #e6f1fb;
+      border-radius: 99px;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .rec-title { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+    .rec-desc  { font-size: 13px; color: #666; }
+
+    /* Quotes */
+    .quote-item {
+      padding: 12px 14px;
+      border-left: 2px solid rgba(0,0,0,0.15);
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: #666;
+      font-style: italic;
+      background: #f7f8fa;
+      border-radius: 0 8px 8px 0;
+    }
+    .quote-item:last-child { margin-bottom: 0; }
+
+    @media (max-width: 600px) {
+      body { padding: 1rem; }
+      .metric-row { grid-template-columns: 1fr 1fr; }
+      .two-col    { grid-template-columns: 1fr; }
+      .finding-row { grid-template-columns: 1fr; }
+      .impact-row { flex-direction: column; align-items: flex-start; }
+      .impact-tags { justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dash-header">
+    <h1>Review intelligence</h1>
+    <p>Weekly executive summary</p>
+  </div>
+
+  <!-- Executive summary -->
+  <div class="card">
+    <p class="card-label">This week at a glance</p>
+    <div class="metric-row">
+      <div class="metric">
+        <p class="metric-label">Overall rating</p>
+        <p class="metric-value">4.4</p>
+        <p class="metric-sub"><i class="ti ti-arrow-down" style="font-size:11px"></i> 0.2 this week</p>
+      </div>
+      <div class="metric">
+        <p class="metric-label">Reviews analyzed</p>
+        <p class="metric-value">1,284</p>
+        <p class="metric-sub neutral">this week</p>
+      </div>
+      <div class="metric">
+        <p class="metric-label">Top issue</p>
+        <p class="metric-value" style="font-size:17px; padding-top:3px;">Packaging</p>
+        <p class="metric-sub">34% of negatives</p>
+      </div>
+      <div class="metric">
+        <p class="metric-label">Action needed</p>
+        <p class="metric-value danger-text" style="font-size:17px; padding-top:3px; color:#a32d2d;">High</p>
+        <p class="metric-sub neutral">3 open issues</p>
+      </div>
+    </div>
+    <div class="finding-row">
+      <div class="finding-block">
+        <strong>Key finding</strong>
+        <p>Packaging complaints up 67%, driving 34% of all negative reviews this week.</p>
+      </div>
+      <div class="finding-block">
+        <strong>Recommended action</strong>
+        <p>Audit packaging supplier for Product X immediately.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top issues + Why ratings changed -->
+  <div class="two-col">
+    <div class="card">
+      <p class="card-label">Top issues requiring attention</p>
+      <div class="issue-row">
+        <span class="badge badge-high">High</span>
+        <span class="issue-name">Packaging damage</span>
+        <span class="issue-impact">34% of negatives</span>
+      </div>
+      <div class="issue-row">
+        <span class="badge badge-high">High</span>
+        <span class="issue-name">Delivery delays</span>
+        <span class="issue-impact">+48% this month</span>
+      </div>
+      <div class="issue-row">
+        <span class="badge badge-medium">Medium</span>
+        <span class="issue-name">Missing accessories</span>
+        <span class="issue-impact">+22% this month</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="card-label">Why ratings changed &nbsp;<span style="font-weight:400; color:#aaa; letter-spacing:0; text-transform:none; font-size:12px;">4.6 → 4.4</span></p>
+      <div class="driver-row">
+        <span class="driver-name">Packaging damage</span>
+        <div class="driver-bar-bg"><div class="driver-bar" style="width:100%"></div></div>
+        <span class="driver-pct">+67%</span>
+      </div>
+      <div class="driver-row">
+        <span class="driver-name">Delivery delays</span>
+        <div class="driver-bar-bg"><div class="driver-bar" style="width:72%"></div></div>
+        <span class="driver-pct">+48%</span>
+      </div>
+      <div class="driver-row">
+        <span class="driver-name">Wrong item received</span>
+        <div class="driver-bar-bg"><div class="driver-bar" style="width:43%"></div></div>
+        <span class="driver-pct">+29%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Emerging risks + What customers love -->
+  <div class="two-col">
+    <div class="card">
+      <p class="card-label">Emerging risks</p>
+      <div class="risk-item">
+        <i class="ti ti-alert-triangle risk-icon"></i>
+        <span>Charger complaints rising for 3 weeks</span>
+      </div>
+      <div class="risk-item">
+        <i class="ti ti-alert-triangle risk-icon"></i>
+        <span>Fit issues increasing among new customers</span>
+      </div>
+      <div class="risk-item">
+        <i class="ti ti-alert-triangle risk-icon"></i>
+        <span>Return requests trending upward</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="card-label">What customers love</p>
+      <div class="love-item">
+        <i class="ti ti-heart love-icon"></i>
+        <span class="love-name">Battery life</span>
+        <span class="love-pct">+23%</span>
+      </div>
+      <div class="love-item">
+        <i class="ti ti-heart love-icon"></i>
+        <span class="love-name">Ease of use</span>
+        <span class="love-pct">+17%</span>
+      </div>
+      <div class="love-item">
+        <i class="ti ti-heart love-icon"></i>
+        <span class="love-name">Product design</span>
+        <span class="love-pct">+11%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Business impact -->
+  <div class="card">
+    <p class="card-label">Business impact</p>
+    <div class="impact-row">
+      <span class="impact-name">Packaging damage</span>
+      <div class="impact-tags">
+        <span class="impact-tag high">Rating — high</span>
+        <span class="impact-tag high">Returns — high</span>
+        <span class="impact-tag high">Revenue risk — high</span>
+      </div>
+    </div>
+    <div class="impact-row">
+      <span class="impact-name">Delivery delays</span>
+      <div class="impact-tags">
+        <span class="impact-tag medium">Rating — medium</span>
+        <span class="impact-tag medium">Returns — medium</span>
+        <span class="impact-tag medium">Revenue risk — medium</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI recommendations -->
+  <div class="card">
+    <p class="card-label">AI recommended actions</p>
+    <div class="rec-item">
+      <div class="rec-num">1</div>
+      <div>
+        <p class="rec-title">Audit packaging supplier</p>
+        <p class="rec-desc">127 complaints this month — highest contributor to rating decline.</p>
+      </div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-num">2</div>
+      <div>
+        <p class="rec-title">Improve packaging quality</p>
+        <p class="rec-desc">Damage reports up 67% since last supplier change.</p>
+      </div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-num">3</div>
+      <div>
+        <p class="rec-title">Update product listing images</p>
+        <p class="rec-desc">Reduce size mismatch and expectation-gap complaints.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supporting reviews -->
+  <div class="card">
+    <p class="card-label">Supporting customer reviews</p>
+    <div class="quote-item">"The box arrived crushed and the item was damaged."</div>
+    <div class="quote-item">"Packaging quality is much worse than before."</div>
+    <div class="quote-item">"Delivery was delayed by a week and the box was torn."</div>
+  </div>
+
+</body>
+</html>
